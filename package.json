@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "push": "git add .; git commit -m 'update'; git push;"
+    "push": "git add .; git commit -m 'update'; git push;",
+    "lint": "eslint src/**/*.js",
+    "dev": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",
