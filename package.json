@@ -1,0 +1,26 @@
+{
+  "name": "nodejs-individual",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "push": "git add .; git commit -m 'update'; git push;"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GoITteacher/nodejs-individual.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GoITteacher/nodejs-individual/issues"
+  },
+  "homepage": "https://github.com/GoITteacher/nodejs-individual#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.10.0",
+    "eslint": "^9.10.0",
+    "globals": "^15.9.0"
+  }
+}
