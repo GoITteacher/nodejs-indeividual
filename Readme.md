@@ -21,8 +21,8 @@
 
 Підключаємо бібліотеку - `import fs from 'fs/promises';`
 
-- `await fs.readFile(filename, [options])` - чтение файла
-- `await fs.writeFile(filename, data, [options])` - запись файла
-- `await fs.appendFile(filename, data, [options])`- добавление в файл
-- `await fs.rename(oldPath, newPath)` - переименование файла.
-- `await fs.unlink(path, callback)` - удаление файла.
+- `await fs.readFile(filename, [options])` - читання файлу
+- `await fs.writeFile(filename, data, [options])` - запису у файл
+- `await fs.appendFile(filename, data, [options])`- додавання у файл
+- `await fs.rename(oldPath, newPath)` - зміна назви файлу
+- `await fs.unlink(path, callback)` - видалення файлу.
