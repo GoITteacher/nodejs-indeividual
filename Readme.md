@@ -1,71 +1,96 @@
-# Module 2
+# Module 3
 
-## Знайомство з Express
+## Валідація
 
-### Основи роботи з Express
+### Бібліотека JOI
 
-- що таке Express
 - інсталяція
-- ініціалізація
-- роутинг
-- req (params, body), res
-- middleware (common, error)
+- Визначення схем
+- Використання методів валідації
+- Підтримка розширень
+- Кастомні повідомлення про помилки
 
-### Middleware
+Example
 
-- Логування: Запис інформації про кожен запит (метод, URL, час, IP тощо).
-- Обробка JSON-даних: Розпакування та обробка даних у форматі JSON, що надходять від клієнта.
-- Обробка URL-кодованих даних: Розкодування та обробка даних, що надходять у формі URL-кодування.
-- Аутентифікація та авторизація: Перевірка інформації про аутентифікацію користувача та його прав доступу.
-- Захист від атак: Включення заходів безпеки, таких як обробка CORS, захист від атак типу CSRF, перевірка параметрів запиту.
-- Робота з сесіями та cookies: Обробка сесій, зберігання та читання інформації у cookies.
-- Обробка статичних файлів: Надання можливості сервера обслуговувати та повертати статичні файли.
-- Обробка помилок: Визначення middleware для обробки помилок на рівні додатку.
-- Моніторинг та аналітика: Збір та обробка аналітичної інформації про використання застосунку.
-- Кешування: Реалізація middleware для кешування результатів запитів та оптимізації швидкодії застосунку.
-- Підготовка запитів до обробки: Валідація, перетворення або обробка даних до їх подальшої обробки в маршрутах.
-- Маршрутизація: Реалізація middleware, які визначають маршрути та викликають відповідні обробники маршрутів.
-- Аналіз та обробка хедерів: Взаємодія з хедерами запиту та відповіді для певного обробника.
-- Перевірка здоров'я застосунку: Реалізація middleware, що перевіряє стан здоров'я сервера та повертає статус.
+```js
+import Joi from 'joi';
 
-### Use Middlware
+const createStudentSchema = Joi.object({
+  name: Joi.string().min(3).max(30).required().messages({
+    'string.base': 'Username should be a string',
+    'string.min': 'Username should have at least {#limit} characters',
+    'string.max': 'Username should have at most {#limit} characters',
+    'any.required': 'Username is required',
+  }),
+  email: Joi.string().email().required(),
+  age: Joi.number().integer().min(6).max(16).required(),
+  gender: Joi.string().valid('male', 'female', 'other').required(),
+  avgMark: Joi.number().min(2).max(12).required(),
+  onDuty: Joi.boolean(),
+});
+```
 
-- logger
-- express.json
-- 404
-- error
+### Валідація BODY
 
-### Змінні оточення
+```js
+import createHttpError from 'http-errors';
 
-- dotenv
-- .env
-- функція env()
+export const validateBody = (schema) => async (req, res, next) => {
+  try {
+    await schema.validateAsync(req.body, {
+      abortEarly: false,
+    });
+    next();
+  } catch (err) {
+    const error = createHttpError(400, 'Bad Request', {
+      errors: err.details,
+    });
+    next(error);
+  }
+};
+```
 
----
+Застосування
 
-## Mongo DB
+```js
+import { validateBody } from '../middlewares/validateBody.js';
+import { createStudentSchema } from '../validation/students.js';
 
-### Підключення
+/* Решта коду файла */
 
-- mongoose
-- ```js
-  export const initMongoDB = async () => {
-    try {
-      const user = env('MONGODB_USER');
-      const pwd = env('MONGODB_PASSWORD');
-      const url = env('MONGODB_URL');
-      const db = env('MONGODB_DB');
+router.post(
+  '/',
+  validateBody(createStudentSchema),
+  ctrlWrapper(createStudentController),
+);
+```
 
-      await mongoose.connect(
-        `mongodb+srv://${user}:${pwd}@${url}/${db}?retryWrites=true&w=majority`,
-      );
-      console.log('Mongo connection successfully established!');
-    } catch (e) {
-      console.log('Error while setting up mongo connection', e);
-      throw e;
-    }
-  };
-  ```
+### Валідація ID
 
-- схеми
-- колекція
+Middleware
+
+```js
+// src/middlewares/isValidId.js
+
+import { isValidObjectId } from 'mongoose';
+import createHttpError from 'http-errors';
+
+export const isValidId = (req, res, next) => {
+  const { studentId } = req.params;
+  if (!isValidObjectId(studentId)) {
+    throw createHttpError(400, 'Bad Request');
+  }
+
+  next();
+};
+```
+
+Застосування
+
+```js
+import { isValidId } from '../middlewares/isValidId.js';
+
+/* Решта коду файла */
+
+router.get('/:studentId', isValidId, ctrlWrapper(getStudentByIdController));
+```
